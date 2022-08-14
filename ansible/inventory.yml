@@ -1,0 +1,105 @@
+# Validator 0
+[validator_0]
+65.108.111.111
+
+# NOTE: optional variables can just be removed.
+[validator_0:vars]
+#============================================================================
+#Settings for initial installation:
+#ansible_user=root
+ansible_ssh_private_key_file = /home/user/.ssh/id_rsa_123
+
+#Setting for for subsequent installations:
+ansible_user=absdef
+ansible_port=19999
+#============================================================================
+
+# Set an individual node name (optional)
+node_name='NODE NAME'
+# Setup one or multiple telemetry endpoints (optional)
+telemetry_url='wss://telemetry.polkadot.io/submit/,wss://telemetry-backend.w3f.community/submit'
+# Only log specify levels, e.g. warnings (optional)
+logging_filter='sync=warn,afg=warn,babe=warn'
+# Location for database, keys, etc (optional)
+#base_path='/mnt/volume'
+# Setup a nginx reverse proxy in front of the binary (optional). Disabled by default.
+enable_reverse_proxy = false
+proxy_port=20001
+# Any additional flags passed on to the 'polkadot' binary (optional)
+# additional_flags = '--no-prometheus --no-mdns'
+### starting v.0.9.22 and newest: --unsafe-pruning is deprecated and has no effect. In future builds it will be removed and providing this flag will lead to an error. #10995 github
+###no-mdns flag, Will: Mostly useful in testing a chain locally in production you don't need it Since all the other node are external
+additional_flags = '--database RocksDb --pruning 1000'
+
+# Validator 1
+#[validator_1]
+#162.12.35.55
+
+#[validator_1:vars]
+#ansible_user=bob
+#telemetry_url=wss://telemetry.polkadot.io/submit/
+#logging_filter='sync=warn,afg=warn,babe=warn'
+
+# ## Group all nodes
+[validator:children]
+validator_0
+#validator_1
+
+# Common variables
+[all:vars]
+# Project name. Will be used as a prefix for the auto-generated node names
+# if an individual `nodeName` is not specified.
+project=YOUR_PROJECT_NAME
+
+# Create sudo user for each instance (to prevent using root access)
+sudo_user='absdef'
+sudo_user_password='your_sudo_user_password'
+
+# Can be left as is.
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ConnectTimeout=15'
+build_dir=$HOME/.config/polkadot-secure-validator/build/w3f/ansible
+
+# Specify which `polkadot` binary to install. Checksum is verified during execution.
+polkadot_binary_url='https://github.com/paritytech/polkadot/releases/download/v0.9.27/polkadot'
+polkadot_binary_checksum='sha256:e6d81f31803ee264931c973ab79bb3f9b1e3f99b7e2fe4b8d6ae93870b179e96'
+
+# Specify the chain/network.
+polkadot_network_id=polkadot
+chain=polkadot
+#polkadot_network_id=ksmcc3
+#chain=kusama
+
+# Nginx authentication settings (for Prometheus).
+nginx_user='prometheus'
+nginx_password='your_nginx_password'
+
+####################################################################################################################################################
+###    MONITORING SETTING    ###    MONITORING SETTING    ###    MONITORING SETTING    ###    MONITORING SETTING    ###    MONITORING SETTING    ###
+####################################################################################################################################################
+
+monitoring_enabled='true'
+
+# Node exporter settings. Disabled by default.
+node_exporter_binary_url='https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz'
+node_exporter_binary_checksum='sha256:68f3802c2dd3980667e4ba65ea2e1fb03f4a4ba026cca375f15a0390ff850949'
+
+# Prometheus and Grafana settings (complete monitoring set). Disabled by default.
+prometheus_binary_url='https://github.com/prometheus/prometheus/releases/download/v2.36.2/prometheus-2.36.2.linux-amd64.tar.gz'
+prometheus_binary_checksum='sha256:3f558531c6a575d8372b576b7e76578a98e2744da6b89982ea7021b6f000cddd'
+
+
+####################################################################################################################################################
+
+
+# Polkadot service restart settings. Disabled by default (recommended). Adjust values accordingly.
+polkadot_restart_enabled='false'
+polkadot_restart_minute='0'
+polkadot_restart_hour='0'
+polkadot_restart_day='29'
+polkadot_restart_month='2'
+polkadot_restart_weekday='1'
+
+# Optional: Restore the chain db from a .7z snapshot
+polkadot_db_snapshot_enabled='false'
+polkadot_db_snapshot_url='https://snapshots.radiumblock.com/polkadot_11524628_2022-08-09.tar.lz4'
+polkadot_db_snapshot_checksum='sha256:b30e5a81a7fbac4abd8f1a9e505304ad3a9fc3317faef041f5ed978060bd9a95'

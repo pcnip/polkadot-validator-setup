@@ -1,0 +1,26 @@
+---
+- name: configure sshd
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    insertbefore: BOF
+    block: |
+      Port 19999
+      PasswordAuthentication no
+      PermitRootLogin no
+      X11Forwarding no
+      Banner none
+      PrintMotd no
+      PermitEmptyPasswords no
+      ChallengeResponseAuthentication no
+      AllowTcpForwarding no
+      PermitTunnel no
+      PermitUserEnvironment no
+
+      KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+      Protocol 2
+      HostKey /etc/ssh/ssh_host_ed25519_key
+      HostKey /etc/ssh/ssh_host_rsa_key
+      AllowUsers {{ sudo_user }}
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+  notify: restart sshd service

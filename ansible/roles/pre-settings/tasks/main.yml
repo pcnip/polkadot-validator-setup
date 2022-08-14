@@ -1,0 +1,26 @@
+---
+# tasks file for monitoring
+
+- name: update and upgrade OS
+  import_tasks: update.yml
+
+- name: reboot machine
+  import_tasks: reboot.yml
+
+- name: install basic programs
+  import_tasks: basic_programs.yml
+
+- name: create sudo user and copy SSH keys
+  import_tasks: sudo.yml
+
+- name: sshd setup
+  import_tasks: sshd.yml
+
+- name: generate SSL keys
+  import_tasks: ssl.yml
+  when: monitoring_enabled|bool
+
+
+
+
+

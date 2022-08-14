@@ -11,20 +11,32 @@
   changed_when: False
 
 - name: open ssh port
-  command: ufw allow 22/tcp
-  when: not ufw_status_result.stdout is search("22/tcp.*ALLOW IN.*Anywhere")
+  command: ufw allow 19999/tcp
+  when: not ufw_status_result.stdout is search("19999/tcp.*ALLOW IN.*Anywhere")
 
-- name: open node_exporter port
-  command: ufw allow 9100/tcp
-  when:
-    - node_exporter_enabled|default(false)|bool
-    - not ufw_status_result.stdout is search("9100/tcp.*ALLOW IN.*Anywhere")
+#- name: open node_exporter port
+#  command: ufw allow 9100/tcp
+#  when:
+#    - monitoring_enabled|default(false)|bool
+#    - not ufw_status_result.stdout is search("9100/tcp.*ALLOW IN.*Anywhere")
+#
+#- name: open polkadot_metrics port
+#  command: ufw allow 9616/tcp
+#  when:
+#    - monitoring_enabled|default(false)|bool
+#    - not ufw_status_result.stdout is search("9616/tcp.*ALLOW IN.*Anywhere")
+#
+#- name: open prometheus port
+#  command: ufw allow 9091/tcp
+#  when:
+#    - monitoring_enabled|default(false)|bool
+#    - not ufw_status_result.stdout is search("9091/tcp.*ALLOW IN.*Anywhere")
 
-- name: open polkadot_metrics port
-  command: ufw allow 9616/tcp
+- name: open grafana port 8805
+  command: ufw allow 8805/tcp
   when:
-    - node_exporter_enabled|default(false)|bool
-    - not ufw_status_result.stdout is search("9616/tcp.*ALLOW IN.*Anywhere")
+    - monitoring_enabled|default(false)|bool
+    - not ufw_status_result.stdout is search("8805/tcp.*ALLOW IN.*Anywhere")
 
 - name: open p2p port
   command: ufw allow {{ p2p_port }}/tcp

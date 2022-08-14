@@ -35,12 +35,36 @@
   copy:
     src: node_exporter.nginx.conf
     dest: /etc/nginx/sites-enabled/node-exporter.conf
-  when: node_exporter_enabled|bool
+  when: monitoring_enabled|bool
 
 - name: create nginx config for polkadot metrics
   copy:
     src: polkadot_metrics.nginx.conf
     dest: /etc/nginx/sites-enabled/polkadot-metrics.conf
+
+- name: create nginx config for prometheus
+  copy:
+    src: prometheus.nginx.conf
+    dest: /etc/nginx/sites-enabled/prometheus.conf
+  when: monitoring_enabled|bool
+
+- name: create nginx config for grafana
+  copy:
+    src: grafana.nginx.conf
+    dest: /etc/nginx/sites-enabled/grafana.conf
+  when: monitoring_enabled|bool
+
+- name: create nginx snippet for self-signed ssl
+  copy:
+    src: self_signed.snippet.conf
+    dest: /etc/nginx/snippets/self-signed.conf
+  when: monitoring_enabled|bool
+
+- name: create nginx snippet with Strong Encryption Settings
+  copy:
+    src: ssl_params.snippet.conf
+    dest: /etc/nginx/snippets/ssl-params.conf
+  when: monitoring_enabled|bool
 
 - name: restart nginx service
   systemd:
@@ -48,4 +72,5 @@
     state: restarted
     daemon_reload: yes
     enabled: yes
+  changed_when: false
   tags: molecule-idempotence-notest

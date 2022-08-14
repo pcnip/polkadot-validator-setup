@@ -25,6 +25,7 @@
 {# --- #}
 [Unit]
 Description=Polkadot Node
+After=network.target
 
 [Service]
 User=polkadot
@@ -34,15 +35,17 @@ ExecStart=/usr/local/bin/polkadot \
   --execution {{ execution }} \
   {% endif %}
   {% if node_name is not none and node_name|length %}
-  --name {{ node_name }} \
+  --name '{{ node_name }}' \
   {% else %}
   --name {{ project|default('project') }}-sv-validator-{{ groups['validator'].index(inventory_hostname) }} \
   {% endif %}
+  {# ЗАКОММЕНТИЛ Т. К. ЗНАЧЕНИЕ COMPILED СТОИТ ПО ДЕФОЛТУ
   {% if wasm_execution is not none and wasm_execution|length %}
   --wasm-execution {{ wasm_execution }} \
   {% else %}
   --wasm-execution Compiled \
   {% endif %}
+  #}
   {% if telemetry_url is not none and telemetry_url|length %}
     {% set urls = telemetry_url.split(',') %}
     {% for url in urls %}
@@ -53,6 +56,7 @@ ExecStart=/usr/local/bin/polkadot \
   {% endif %}
   {% if enable_reverse_proxy is not none and enable_reverse_proxy == 'true' %}
   --public-addr=/ip4/{{ hostvars[inventory_hostname].public_ip.json.ip }}/tcp/{{ proxy_port }} \
+  --listen-addr=/ip4/127.0.0.1/tcp/{{ p2p_port }} \
   {% endif %}
   {% if logging_filter is not none and logging_filter|length %}
   -l{{ logging_filter }} \
@@ -73,11 +77,12 @@ ExecStart=/usr/local/bin/polkadot \
   {# --- #}
   --validator \
   --chain={{ chain }} \
-  --listen-addr=/ip4/127.0.0.1/tcp/{{ p2p_port }} \
+  {# "Auto" by default
   --rpc-methods=Unsafe
+  #}
 
 Restart=always
-RestartSec=60
+RestartSec=120
 
 [Install]
 WantedBy=multi-user.target

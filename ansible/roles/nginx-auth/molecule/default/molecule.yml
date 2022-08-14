@@ -19,7 +19,7 @@ provisioner:
   inventory:
     host_vars:
       nginx-auth-validator-node:
-        node_exporter_enabled: 'true'
+        monitoring_enabled: 'true'
 verifier:
   name: testinfra
   lint:

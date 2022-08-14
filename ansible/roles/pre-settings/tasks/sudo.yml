@@ -1,0 +1,29 @@
+---
+- name: create {{ sudo_user }} group
+  group:
+    name: '{{ sudo_user }}'
+    state: present
+
+- name: add {{ sudo_user }} user
+  user:
+    name: '{{ sudo_user }}'
+    password: '{{ sudo_user_password | password_hash("sha512") }}'
+    group: '{{ sudo_user }}'
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+
+- name: create ssh key dir
+  file:
+    path: /home/{{ sudo_user }}/.ssh
+    state: directory
+    mode: '0700'
+
+- name: copy SSH keys from root dir to {{ sudo_user }} dir
+  shell: |
+    set -o pipefail
+    cp /root/.ssh/authorized_keys /home/{{ sudo_user }}/.ssh/authorized_keys
+    chown -R {{ sudo_user }}:{{ sudo_user }} /home/{{ sudo_user }}/.ssh
+    chmod 600 /home/{{ sudo_user }}/.ssh/authorized_keys
+  args:
+    executable: /bin/bash

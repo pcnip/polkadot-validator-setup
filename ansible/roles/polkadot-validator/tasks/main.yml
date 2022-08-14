@@ -11,6 +11,7 @@
 
 - name: proxy setup
   import_tasks: proxy.yml
+  when: enable_reverse_proxy|default(false)|bool or enableReverseProxy|default(false)|bool
 
 - name: service setup
   import_tasks: service.yml

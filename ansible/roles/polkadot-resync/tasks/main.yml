@@ -6,9 +6,9 @@
 - name: purge chain
   shell: |
     set -o pipefail
-    /usr/local/bin/polkadot purge-chain -y
+    /usr/local/bin/polkadot purge-chain --base-path /home/polkadot/.local/share/polkadot/ --chain {{ chain }} -y
   become: yes
-  become_user: polkadot
+  become_user: root
   args:
     executable: /bin/bash
   changed_when: False

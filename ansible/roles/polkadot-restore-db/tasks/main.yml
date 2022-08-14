@@ -1,4 +1,10 @@
-- name: Install 7z  
+- name: Install lz4
+  apt:
+    name: lz4
+    state: present
+    update_cache: yes
+
+- name: Install p7zip-full
   apt:
     name: p7zip-full
     state: present
@@ -18,7 +24,7 @@
   get_url:
     url: '{{ polkadot_db_snapshot_url }}'
     checksum: '{{ polkadot_db_snapshot_checksum | quote }}'
-    dest: '{{ db_dest_path }}/db.new.7z'
+    dest: '{{ db_dest_path }}/db.new.lz4'
     mode: '0700'
     owner: 'polkadot'
     group: 'polkadot'  
@@ -33,8 +39,9 @@
     set -o pipefail
     cd {{ db_dest_path }}
     mv db db.back
-    7z x db.new.7z
-    rm db.new.7z
+    lz4 -c -d db.new.lz4 | tar -x -C {{ db_dest_path }}/
+    rm db.new.lz4
+    rm -R db.back
     chown -R polkadot:polkadot db/
   args:
     executable: /bin/bash

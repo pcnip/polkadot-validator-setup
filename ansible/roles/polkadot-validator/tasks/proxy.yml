@@ -1,10 +1,4 @@
 ---
-- name: install nginx package
-  apt:
-    name: nginx
-    state: present
-    update_cache: yes
-
 - name: create nginx config
   copy:
     src: nginx.conf
@@ -25,8 +19,6 @@
     src: proxy.conf.j2
     dest: /etc/nginx/streams-enabled/polkadot-proxy.conf
     mode: 0600
-  when:
-    - enable_reverse_proxy|default(false)|bool or enableReverseProxy|default(false)|bool
 
 - name: restart nginx service
   systemd:

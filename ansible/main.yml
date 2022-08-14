@@ -6,6 +6,13 @@
   - name: Wait for nodes to become reachable
     wait_for_connection:
 
+- name: pre-settings
+  hosts: validator
+  become: yes
+  strategy: free
+  roles:
+  - pre-settings
+
 - name: validator
   hosts: validator
   become: yes
@@ -19,9 +26,16 @@
   roles:
   - nginx-auth  
 
-- name: node-exporter
+- name: monitoring
   hosts: validator
   become: yes
   strategy: free
   roles:
-  - { role: node-exporter, when: node_exporter_enabled|bool }
+  - { role: monitoring, when: monitoring_enabled|bool }
+
+- name: polkadot-restore-db
+  hosts: validator
+  become: yes
+  strategy: free
+  roles:
+  - { role: polkadot-restore-db, when: polkadot_db_snapshot_enabled|bool }

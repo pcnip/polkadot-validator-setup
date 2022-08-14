@@ -1,0 +1,11 @@
+---
+# tasks file for monitoring
+
+- name: node_exporter installation
+  import_tasks: node-exporter.yml
+
+- name: prometheus installation
+  import_tasks: prometheus.yml
+
+- name: grafana installation
+  import_tasks: grafana.yml

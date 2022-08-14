@@ -1,3 +1,4 @@
+---
 - name: create node_exporter download dir
   file:
     path: /root/node_exporter

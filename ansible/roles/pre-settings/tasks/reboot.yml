@@ -1,0 +1,4 @@
+---
+- name: Reboot the machine (Wait for 2 min)
+  reboot:
+    reboot_timeout: 120

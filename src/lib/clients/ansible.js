@@ -83,11 +83,11 @@ class Ansible {
     };
 
     if (this.config.nodeExporter?.enabled) {
-      data.nodeExporterEnabled = true;
+      data.monitoringEnabled = true;
       data.nodeExporterBinaryUrl = this.config.nodeExporter.binary.url;
       data.nodeExporterBinaryChecksum = this.config.nodeExporter.binary.checksum;
     } else {
-      data.nodeExporterEnabled = false;
+      data.monitoringEnabled = false;
     }
 
     if (this.config.polkadotRestart?.enabled) {
@@ -100,10 +100,27 @@ class Ansible {
     } else {
       data.polkadotRestartEnabled = false;
     }
-
+/*
     if(this.config.validators.dbSnapshot?.url != undefined && this.config.validators.dbSnapshot?.checksum != undefined){
       data.dbSnapshotUrl = this.config.validators.dbSnapshot.url;
       data.dbSnapshotChecksum = this.config.validators.dbSnapshot.checksum;
+    }
+*/
+
+    if (this.config.validators.dbSnapshot?.enabled) {
+      data.dbSnapshotEnabled = true;
+      data.dbSnapshotUrl = this.config.validators.dbSnapshot.url;
+      data.dbSnapshotChecksum = this.config.validators.dbSnapshot.checksum;
+    } else {
+      data.dbSnapshotEnabled = false;
+    }
+
+    if (this.config.validators.prometheus?.enabled) {
+      data.monitoringEnabled = true;
+      data.prometheusUrl = this.config.validators.prometheus.url;
+      data.prometheusChecksum = this.config.validators.prometheus.checksum;
+    } else {
+      data.monitoringEnabled = false;
     }
 
     tpl.create(origin, target, data);

@@ -1,0 +1,82 @@
+---
+- name: create prometheus download dir
+  file:
+    path: /root/prometheus
+    state: directory
+    mode: '0755'
+
+- name: create prometheus directory /etc/prometheus
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: '0755'
+
+- name: create prometheus directory /var/lib/prometheus
+  file:
+    path: /var/lib/prometheus
+    state: directory
+    mode: '0755'
+
+- name: get current prometheus sha256
+  shell: |
+    sha256sum /root/prometheus/archive.tar.gz | sed -n 's/^\(\S*\).*/sha256:\1/p'
+  args:
+    executable: /bin/bash
+  register: prometheus_sha256
+
+- name: download prometheus
+  get_url:
+    url: '{{ prometheus_binary_url | quote }}'
+    checksum: '{{ prometheus_binary_checksum | quote }}'
+    dest: /root/prometheus/archive.tar.gz
+    mode: '0700'
+  when: prometheus_sha256.stdout != prometheus_binary_checksum
+
+- name: unarchive prometheus
+  unarchive:
+    src: /root/prometheus/archive.tar.gz
+    remote_src: yes
+    dest: /root/prometheus
+  when: prometheus_sha256.stdout != prometheus_binary_checksum
+
+- name: copy prometheus binary
+  shell: |
+    set -o pipefail
+    cp /root/prometheus/prometheus*linux-amd64/prometheus /usr/local/bin/
+    cp /root/prometheus/prometheus*linux-amd64/promtool /usr/local/bin/
+    cp -r /root/prometheus/prometheus*linux-amd64/consoles /etc/prometheus
+    cp -r /root/prometheus/prometheus*linux-amd64/console_libraries /etc/prometheus
+    chmod 755 /usr/local/bin/prometheus
+    chmod 755 /usr/local/bin/promtool
+    chown root:root /usr/local/bin/prometheus
+    chown root:root /usr/local/bin/promtool
+    chown -R root:root /etc/prometheus/consoles
+    chown -R root:root /etc/prometheus/console_libraries
+  args:
+    executable: /bin/bash
+  changed_when: False
+  when: prometheus_sha256.stdout != prometheus_binary_checksum
+
+- name: create prometheus systemd unit
+  copy:
+    src: prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: '600'
+
+- name: create prometheus YAML configuration file
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+    owner: root
+    group: root
+    mode: '600'
+
+- name: start prometheus service
+  systemd:
+    name: prometheus
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+  changed_when: false

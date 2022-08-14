@@ -1,0 +1,12 @@
+---
+- name: install mc
+  apt:
+    name: mc
+    state: present
+    update_cache: yes
+
+- name: install nginx package
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes

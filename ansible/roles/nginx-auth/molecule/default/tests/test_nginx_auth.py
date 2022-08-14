@@ -19,7 +19,7 @@ def test_htpasswd(host):
 
 
 def test_polkadot_service_file(host):
-    if host.ansible.get_variables()['node_exporter_enabled'] == "true":
+    if host.ansible.get_variables()['monitoring_enabled'] == "true":
         cfg = host.file("/etc/nginx/sites-enabled/node-exporter.conf")
         assert cfg.exists
         assert cfg.user == 'root'

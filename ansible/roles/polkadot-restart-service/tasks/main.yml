@@ -18,5 +18,5 @@
   register: result    
   until: result.status == 200
   retries: 12
-  delay: 5 
+  delay: 10
   tags: molecule-notest
